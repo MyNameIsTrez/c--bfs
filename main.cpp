@@ -4,6 +4,7 @@
 // #include <algorithm>
 #include <queue>
 
+#include <cmath> // pow()
 
 
 struct Node
@@ -19,7 +20,6 @@ std::ostream& operator<<(std::ostream& os, const Node& node)
     os << "x: " << node.x << ", y: " << node.y;
     return os;
 }
-
 
 
 struct NeighborNodes
@@ -38,18 +38,22 @@ struct NeighborNodes
 };
 
 
-
 class Grid
 {
     void print_column_indices(std::string::size_type max_row_index_length);
     void print_row_indices(std::string::size_type max_row_index_length);
 public:
+    // Grid(void);
+    // Grid(char empty_char) : empty_character(empty_char) {}
+
+    void print(void);
+
     int width;
     int height;
 
-    std::vector<std::vector<char>> grid;
+    char empty_character = ' ';
 
-    void print(void);
+    std::vector<std::vector<char>> grid;
 };
 
 
@@ -64,18 +68,31 @@ void Grid::print(void)
 
 void Grid::print_column_indices(std::string::size_type max_row_index_length)
 {
-    std::cerr << std::string(max_row_index_length, ' ');
-
     std::vector<char>::size_type column_count = grid[0].size();
 
     std::string::size_type max_column_index_length = std::to_string(column_count).length();
 
-    for (int column_index = 0; column_index < column_count; column_index++)
+    for (ssize_t digit_index = max_column_index_length - 1; digit_index >= 0; digit_index--)
     {
-        std::cerr << column_index % 10;
-    }
+        std::cerr << std::string(max_row_index_length, empty_character);
 
-    std::cerr << std::endl;
+        for (std::vector<char>::size_type column_index = 0; column_index < column_count; column_index++)
+        {
+            int div = static_cast<int>(std::pow(10.0, digit_index));
+            int digit = column_index / div % 10;
+
+            if (div <= column_index || (column_index == 0 && digit_index == 0))
+            {
+                std::cerr << digit;
+            }
+            else
+            {
+                std::cerr << empty_character;
+            }
+        }
+
+        std::cerr << std::endl;
+    }
 }
 
 
@@ -87,7 +104,7 @@ void Grid::print_row_indices(std::string::size_type max_row_index_length)
 
         std::string::size_type row_index_length = std::to_string(row_index).length();
 
-        std::cerr << std::string(max_row_index_length - row_index_length, ' ');
+        std::cerr << std::string(max_row_index_length - row_index_length, empty_character);
 
         std::cerr << row_index;
 
@@ -98,7 +115,6 @@ void Grid::print_row_indices(std::string::size_type max_row_index_length)
         std::cerr << std::endl;
     }
 }
-
 
 
 class Game
@@ -246,7 +262,6 @@ void Game::parse_grid(void)
         grid.grid.push_back(std::vector<char>(row.begin(), row.end()));
     }
 }
-
 
 
 int main()
